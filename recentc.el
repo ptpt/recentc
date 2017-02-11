@@ -202,7 +202,7 @@ the end of the user input, delete to end of input."
             (recentc-find-candidates)
             :require-match t
             :action #'find-file
-            :caller 'recentc-ivy-find-closed-file))
+            :caller #'recentc-ivy-find-closed-file))
 
 (defun recentc-find-closed-file ()
   (interactive)
@@ -212,7 +212,7 @@ the end of the user input, delete to end of input."
          (recentc-ido-find-closed-file))
         (t (message "enable ivy-mode or ido-mode first"))))
 
-(define-key recentc-mode-map "\C-x\C-r" #'recentc-find-closed-file)
-(define-key recentc-mode-map "\C-x\C-u" #'recentc-reopen-last-closed-file)
+(define-key recentc-mode-map "\C-c\C-r" #'recentc-find-closed-file)
+(define-key recentc-mode-map "\C-c\C-u" #'recentc-reopen-last-closed-file)
 
 (provide 'recentc)
