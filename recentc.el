@@ -139,41 +139,41 @@ This function only can be used in `kill-emacs-hook'."
 (defun recentc--ido-keymap-setup ()
   (define-key ido-completion-map [?\C-k] 'recentc-ido-kill-recentc))
 
-;; should be deprecated
-(defvar recentc--ido-candidates nil
-  "ido candidates that correspond to recently closed files.")
+(defun recentc-find-candidates ()
+  (recentc-clear-non-existent-files)
+  (let (counts suffix candidates)
+    (dolist (file recentc-list)
+      (let* ((basename (file-name-nondirectory file))
+             (match (assoc basename counts)))
+
+        (if match
+            (setcdr match (1+ (cdr match)))
+          ;; `add-to-list' doesn't work with lexical binding
+          (pushnew (cons basename 1) counts))
+
+        (pushnew (cons (if (cdr match)
+                           (concat basename (format "<%d>" (cdr match)))
+                         basename)
+                       file)
+                 candidates)))
+    (reverse candidates)))
 
 (defun recentc-ido-find-closed-file ()
   "Find recently opened files using ido-mode."
   (interactive)
-  (setq recentc--ido-candidates nil)
-  (recentc-clear-non-existent-files)
-  (let ((records nil) (suffix nil))
-    (dolist (file recentc-list)
-      (let* ((f (file-name-nondirectory file))
-             (match (assoc f records)))
-        (if match
-            (setcdr match (1+ (cdr match)))
-          ;; `add-to-list' doesn't work with lexical binding
-          (pushnew (cons f 1) records))
-        (setq suffix
-              (if (cdr match)
-                  (format "<%d>" (cdr match))
-                ""))
-        (add-to-list 'recentc--ido-candidates
-                     (cons (concat f suffix) file) t))))
   (add-hook 'ido-setup-hook 'recentc--ido-keymap-setup)
-  (let* ((choice
+  (let* ((candidates (recentc-find-candidates))
+         (choice
           (condition-case err
               (ido-completing-read
                "Recently closed files: "
-               (mapcar #'car recentc--ido-candidates)
+               (mapcar #'car candidates)
                nil t)
             ;; remove keymap
             (quit (remove-hook 'ido-setup-hook 'recentc--ido-keymap-setup))
             (error (remove-hook 'ido-setup-hook 'recentc--ido-keymap-setup)
                    (signal (car err) (cdr err)))))
-         (filename (and choice (assoc choice recentc--ido-candidates))))
+         (filename (and choice (assoc choice candidates))))
     (remove-hook 'ido-setup-hook 'recentc--ido-keymap-setup)
     (when filename
       (find-file (cdr filename)))))
@@ -194,25 +194,6 @@ the end of the user input, delete to end of input."
               (delq (assoc file recentc--ido-candidates) recentc--ido-candidates))
         (setq ido-cur-list
               (delq file ido-cur-list))))))
-
-(defun recentc-find-candidates ()
-  (recentc-clear-non-existent-files)
-  (let (counts suffix candidates)
-    (dolist (file recentc-list)
-      (let* ((basename (file-name-nondirectory file))
-             (match (assoc basename counts)))
-
-        (if match
-            (setcdr match (1+ (cdr match)))
-          ;; `add-to-list' doesn't work with lexical binding
-          (pushnew (cons basename 1) counts))
-
-        (pushnew (cons (if (cdr match)
-                           (concat basename (format "<%d>" (cdr match)))
-                         basename)
-                       file)
-                 candidates)))
-    (reverse candidates)))
 
 (defun recentc-ivy-find-closed-file ()
   "Find recently opened files using ido-mode."
