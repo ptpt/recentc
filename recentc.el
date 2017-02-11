@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t -*-
 
-;;; recentc.el --- remember recently closed files
+;;; recentc.el --- list recently closed files
 
 ;; Copyright (C) 2012-2017 Tao Peng <pt@taopeng.me>
 
