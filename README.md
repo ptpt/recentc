@@ -13,3 +13,22 @@ List recently closed files in Emacs
 Press `C-x C-r` to list recently closed files with `ivy-mode`
 (preferred) or `ido-mode`. Press `C-x C-u` to open the most recently
 closed file.
+
+## Configuration
+
+Customize key bindings:
+
+```lisp
+(define-key recentc-mode-map "\C-c\C-r" #'recentc-find-closed-file)
+(define-key recentc-mode-map "\C-c\C-u" #'recentc-reopen-last-closed-file)
+```
+
+
+Exclude closed files under `~/.emacs.d/` (`user-emacs-directory`):
+
+```lisp
+(add-hook 'recentc-exclude-conditions
+          (lambda (filename)
+            (string-prefix-p (expand-file-name user-emacs-directory)
+                             (file-name-directory (expand-file-name filename)))))
+```
