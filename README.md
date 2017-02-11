@@ -32,3 +32,15 @@ Exclude closed files under `~/.emacs.d/` (`user-emacs-directory`):
             (string-prefix-p (expand-file-name user-emacs-directory)
                              (file-name-directory (expand-file-name filename)))))
 ```
+
+
+Exclude closed files under `~/.git/`
+
+```lisp
+(defun pt/folder-name (filename)
+  (file-name-base (directory-file-name (file-name-directory filename))))
+
+(add-hook 'recentc-exclude-conditions
+          (lambda (filename)
+            (string-equal ".git" (pt/folder-name (expand-file-name filename)))))
+```
