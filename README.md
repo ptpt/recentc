@@ -34,7 +34,7 @@ Exclude closed files under `~/.emacs.d/` (`user-emacs-directory`):
 ```
 
 
-Exclude closed files under `~/.git/`
+Exclude closed files in `.git`:
 
 ```lisp
 (defun pt/folder-name (filename)
